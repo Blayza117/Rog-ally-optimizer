@@ -1,0 +1,26 @@
+name: Build ROG Ally Optimizer
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        architecture: 'x64'
+    - name: Install
+      run: pip install pyinstaller pillow
+    - name: Build
+      run: |
+        python -c "from PIL import Image; img=Image.new('RGB',(32,32),(255,0,34)); img.save('icon.ico')"
+        pyinstaller --onefile --windowed --name ROGAllyOptimizer --icon icon.ico --add-data "ROGAllyOptimizer.ps1;." --uac-admin launcher.py
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ROGAllyOptimizer-x64
+        path: dist/ROGAllyOptimizer.exe
+        retention-days: 90
