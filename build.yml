@@ -1,0 +1,91 @@
+name: Build ROG Ally Optimizer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python 64-bit
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        architecture: 'x64'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pillow
+
+    - name: Generate icon
+      run: |
+        python -c "
+        from PIL import Image, ImageDraw
+        import io, struct
+        def make(size):
+            img = Image.new('RGBA',(size,size),(0,0,0,0))
+            d = ImageDraw.Draw(img)
+            m = max(1,size//14)
+            d.rounded_rectangle([m,m,size-m,size-m],radius=max(2,size//5),fill=(6,6,14,255))
+            bw = max(2,size//10)
+            d.rounded_rectangle([m,m,m+bw,size-m],radius=2,fill=(255,0,34,255))
+            s = size/64.0
+            RED=(255,0,34,255); CYAN=(0,229,255,255)
+            def rr(x1,y1,x2,y2,c): d.rectangle([int(x1*s),int(y1*s),int(x2*s),int(y2*s)],fill=c)
+            rr(22,14,29,50,RED); rr(29,14,43,21,RED)
+            rr(29,27,41,34,RED); rr(37,34,48,50,RED)
+            dot=max(3,int(5*s))
+            d.ellipse([size-m-dot-1,size-m-dot-1,size-m-1,size-m-1],fill=CYAN)
+            return img
+        sizes=[16,32,48,64,128,256]
+        images=[]
+        for s in sizes:
+            buf=io.BytesIO()
+            make(s).save(buf,format='PNG')
+            images.append((s,buf.getvalue()))
+        n=len(images)
+        header=struct.pack('<HHH',0,1,n)
+        offset=6+n*16; entries=b''; data=b''
+        for (sz,png) in images:
+            w=sz if sz<256 else 0; h=sz if sz<256 else 0
+            entries+=struct.pack('<BBBBHHII',w,h,0,0,1,32,len(png),offset)
+            offset+=len(png); data+=png
+        with open('icon.ico','wb') as f: f.write(header+entries+data)
+        print('Icon OK')
+        "
+
+    - name: Build EXE
+      run: |
+        pyinstaller `
+          --onefile `
+          --windowed `
+          --name "ROGAllyOptimizer" `
+          --icon "icon.ico" `
+          --add-data "ROGAllyOptimizer.ps1;." `
+          --uac-admin `
+          --target-arch x86_64 `
+          launcher.py
+
+    - name: Verify
+      run: |
+        if (Test-Path "dist\ROGAllyOptimizer.exe") {
+          $mb = [math]::Round((Get-Item "dist\ROGAllyOptimizer.exe").Length/1MB,1)
+          Write-Host "SUCCESS: ROGAllyOptimizer.exe - $mb MB"
+        } else {
+          Write-Error "FAILED - exe not found"
+          exit 1
+        }
+
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: ROGAllyOptimizer-x64
+        path: dist/ROGAllyOptimizer.exe
+        retention-days: 90
