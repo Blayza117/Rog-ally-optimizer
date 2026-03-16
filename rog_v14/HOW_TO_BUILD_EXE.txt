@@ -1,0 +1,65 @@
+HOW TO GET YOUR .EXE IN 5 STEPS
+================================
+No coding. No Python. Just upload and download.
+
+STEP 1 - Make a free GitHub account
+------------------------------------
+1. Open Edge on your Ally
+2. Go to:  https://github.com
+3. Click Sign Up (top right)
+4. Enter email, password, username
+5. Verify your email
+
+
+STEP 2 - Create a new repository
+----------------------------------
+1. After signing in, click the green NEW button (top left)
+2. Repository name:  rog-ally-optimizer
+3. Set to PUBLIC
+4. Click CREATE REPOSITORY
+
+
+STEP 3 - Upload all the files
+-------------------------------
+1. On your new empty repository page
+2. Click the link that says "uploading an existing file"
+3. Open your rog_v14 folder on your Ally
+4. Select ALL files including the .github folder
+   (Hold Ctrl+A to select everything)
+5. Drag them all into the browser window
+6. Scroll down and click COMMIT CHANGES
+
+
+STEP 4 - Wait for it to build (3-5 minutes)
+---------------------------------------------
+1. Click the ACTIONS tab at the top
+2. You will see "Build ROG Ally Optimizer" running
+3. Wait for the green checkmark
+4. Done - your exe is ready
+
+
+STEP 5 - Download your exe
+----------------------------
+Option A - Quick download:
+  1. Click the build name with the green checkmark
+  2. Scroll to the bottom - Artifacts section
+  3. Click ROGAllyOptimizer-v17-x64
+  4. Extract the zip - inside is ROGAllyOptimizer.exe
+
+Option B - From Releases (shareable link):
+  1. On your repository page click Releases (right side)
+  2. Click ROGAllyOptimizer.exe to download
+  3. This link works for anyone - share it!
+
+
+EVERY TIME YOU UPDATE THE APP
+-------------------------------
+1. Upload the new ROGAllyOptimizer.ps1 to GitHub
+2. Click Commit Changes
+3. GitHub rebuilds automatically in 3-5 minutes
+4. Download the new exe
+
+
+THAT IS IT.
+A real Windows machine in the cloud builds your exe.
+You just download it.
