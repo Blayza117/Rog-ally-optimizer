@@ -1,0 +1,38 @@
+name: Build ROG Ally Optimizer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install ps2exe
+        shell: powershell
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module -Name ps2exe -Force
+      
+      - name: Build EXE
+        shell: powershell
+        run: |
+          Import-Module ps2exe
+          Invoke-ps2exe -inputFile "ROGAllyOptimizer.ps1" `
+                        -outputFile "ROGAllyOptimizer.exe" `
+                        -title "ROG Ally Optimizer" `
+                        -noConsole -requireAdmin
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ROGAllyOptimizer-v17-x64
+          path: |
+            ROGAllyOptimizer.exe
+            Launch.bat
+            
